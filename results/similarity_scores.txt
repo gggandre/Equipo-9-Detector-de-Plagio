@@ -1,1 +1,15 @@
-Document 1 vs Document 2: 3.25% similar
+Document 1 vs Document 2: 7.10% similar
+Document 1 vs Document 3: 6.85% similar
+Document 1 vs Document 4: 2.38% similar
+Document 1 vs Document 5: 2.90% similar
+Document 1 vs Document 6: 7.14% similar
+Document 2 vs Document 3: 7.41% similar
+Document 2 vs Document 4: 8.57% similar
+Document 2 vs Document 5: 8.84% similar
+Document 2 vs Document 6: 9.29% similar
+Document 3 vs Document 4: 5.26% similar
+Document 3 vs Document 5: 7.14% similar
+Document 3 vs Document 6: 13.49% similar
+Document 4 vs Document 5: 4.40% similar
+Document 4 vs Document 6: 3.25% similar
+Document 5 vs Document 6: 10.26% similar

@@ -1,32 +1,27 @@
+# preprocessing.py
+import nltk
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
 import re
 
 def tokenize(text):
     """ Divide el texto en tokens basados en espacios y puntuación. """
     return re.findall(r'\b\w+\b', text.lower())
 
-def remove_stopwords(tokens, stopwords):
+def remove_stopwords(tokens):
     """ Elimina stopwords de una lista de tokens. """
-    return [token for token in tokens if token not in stopwords]
-
-def lemmatize_word(word):
-    """ Aplica reglas básicas para lematización de palabras en inglés. """
-    if word.endswith('ies') and len(word) > 4:
-        return word[:-3] + 'y'
-    elif word.endswith('es'):
-        if word[-3] in 'sxz' or word[-4:-2] in ('sh', 'ch'):
-            return word[:-2]
-        else:
-            return word[:-1]
-    elif word.endswith('s'):
-        return word[:-1]
-    return word
+    from nltk.corpus import stopwords
+    stop_words = set(stopwords.words('english'))
+    return [token for token in tokens if token not in stop_words]
 
 def stem_words(tokens):
-    """ Aplica un enfoque simple de stemming a cada token, usando lematización manual. """
-    return [lemmatize_word(token) for token in tokens]
+    """ Aplica stemming a cada token utilizando el algoritmo de Porter. """
+    stemmer = PorterStemmer()
+    return [stemmer.stem(token) for token in tokens]
 
-def preprocess_text(text, stopwords):
+def preprocess_text(text):
     """ Preprocesa el texto completo aplicando tokenización, remoción de stopwords y stemming. """
     tokens = tokenize(text)
-    tokens = remove_stopwords(tokens, stopwords)
+    tokens = remove_stopwords(tokens)
     return stem_words(tokens)
