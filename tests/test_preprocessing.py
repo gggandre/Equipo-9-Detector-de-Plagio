@@ -1,3 +1,7 @@
+# Autores: A01745312 - Paula Sophia Santoyo Arteaga
+#          A01753176 - Gilberto André García Gaytán
+#          A01379299 - Ricardo Ramírez Condado
+
 import unittest
 from src.preprocessing import tokenize, remove_stopwords, stem_words, preprocess_text
 
