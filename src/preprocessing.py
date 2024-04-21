@@ -1,5 +1,3 @@
-# preprocessing.py
-
 import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
@@ -12,7 +10,6 @@ def tokenize(text):
 
 def remove_stopwords(tokens):
     """ Elimina stopwords de una lista de tokens. """
-    from nltk.corpus import stopwords
     stop_words = set(stopwords.words('english'))
     return [token for token in tokens if token not in stop_words]
 

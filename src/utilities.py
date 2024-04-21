@@ -30,3 +30,15 @@ def save_results_to_excel(results, filepath):
     df.to_excel(filepath, index=False)
 
 
+def evaluate_results(plagiarism_results, real_labels):
+    TP = FP = TN = FN = 0
+    for result, real_label in zip(plagiarism_results, real_labels):
+        if result == "plagiarism" and real_label == "plagiarism":
+            TP += 1
+        elif result == "plagiarism" and real_label == "genuine":
+            FP += 1
+        elif result == "genuine" and real_label == "genuine":
+            TN += 1
+        elif result == "genuine" and real_label == "plagiarism":
+            FN += 1
+    return TP, FP, TN, FN

@@ -1,9 +1,7 @@
-# main.py
-
 import tkinter as tk
 from tkinter import filedialog, messagebox, scrolledtext
 import os
-from utilities import load_document, save_results_to_txt, save_results_to_excel
+from utilities import load_document, save_results_to_txt, evaluate_results
 from preprocessing import preprocess_text
 from feature_extraction import build_feature_vector
 from text_comparison import jaccard_similarity
@@ -50,24 +48,29 @@ class PlagiarismCheckerApp:
         processed_suspicious_docs = [preprocess_text(doc) for doc in self.suspicious_documents]
         processed_original_docs = [preprocess_text(doc) for doc in self.original_documents]
 
-        all_results = []  # Lista para almacenar todos los resultados
+        plagiarism_results = []
+        real_labels = []
 
         # Iterar sobre cada documento sospechoso
         for j, suspicious_doc in enumerate(processed_suspicious_docs):
-            results = []  # Lista para almacenar los resultados de este documento sospechoso
+            max_similarity = 0
+            plagiarism_result = "genuine"
+            real_label = "genuine"
             # Iterar sobre cada documento original
             for i, original_doc in enumerate(processed_original_docs):
                 similarity = jaccard_similarity(build_feature_vector(original_doc), build_feature_vector(suspicious_doc))
-                results.append((f"Original Document {i+1}", f"Suspicious Document {j+1}", similarity))
-                self.text_area.insert(tk.END, f"Jaccard Similarity between Original Document {i+1} and Suspicious Document {j+1}: {similarity*100:.2f}%\n")
-            # Agregar los resultados de este documento sospechoso a la lista de todos los resultados
-            all_results.append(results)
+                if similarity > max_similarity:
+                    max_similarity = similarity
+                    plagiarism_result = f"plagiarism from Original Document {i+1}"
+                    real_label = "plagiarism"
+            plagiarism_results.append(plagiarism_result)
+            real_labels.append(real_label)
+            self.text_area.insert(tk.END, f"Suspicious Document {j+1} detected as {plagiarism_result} with max similarity: {max_similarity*100:.2f}%\n")
 
-        save_results_to_txt(all_results, 'results/similarity_scores.txt')
-        #save_results_to_excel(all_results, 'results/similarity_scores.xlsx')
-        messagebox.showinfo("Success", "Results saved to files.")
+        TP, FP, TN, FN = evaluate_results(plagiarism_results, real_labels)
+        AUC = (1 + TP - FP) / 2
 
-
+        messagebox.showinfo("Success", f"Results saved to files.\nTP: {TP}\nFP: {FP}\nTN: {TN}\nFN: {FN}\nAUC: {AUC}")
 
     def clear_results(self):
         self.text_area.delete(1.0, tk.END)
@@ -87,7 +90,7 @@ def main():
 if __name__ == '__main__':
     # Obtenemos la ruta del directorio del script
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    original_documents_directory = os.path.join(script_dir,"..", "data", "original")
+    original_documents_directory = os.path.join(script_dir, "..", "data", "original")
     app = PlagiarismCheckerApp(tk.Tk())
     app.original_documents = load_original_documents(original_documents_directory)
     app.root.mainloop()
