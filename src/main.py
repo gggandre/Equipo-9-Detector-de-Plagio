@@ -50,19 +50,24 @@ class PlagiarismCheckerApp:
 
         plagiarism_results = []
         real_labels = []
-
+        all_results = []
         # Iterar sobre cada documento sospechoso
         for j, suspicious_doc in enumerate(processed_suspicious_docs):
             max_similarity = 0
             plagiarism_result = "genuine"
             real_label = "genuine"
+            results = [] 
             # Iterar sobre cada documento original
             for i, original_doc in enumerate(processed_original_docs):
+                # Lista para almacenar los resultados de este documento sospechoso
                 similarity = jaccard_similarity(build_feature_vector(original_doc), build_feature_vector(suspicious_doc))
+                results.append((f"Original Document {i+1}", f"Suspicious Document {j+1}", similarity))
+                self.text_area.insert(tk.END, f"Jaccard Similarity between Original Document {i+1} and Suspicious Document {j+1}: {similarity*100:.2f}%\n")
                 if similarity > max_similarity:
                     max_similarity = similarity
                     plagiarism_result = f"plagiarism from Original Document {i+1}"
                     real_label = "plagiarism"
+            all_results.append(results)
             plagiarism_results.append(plagiarism_result)
             real_labels.append(real_label)
             self.text_area.insert(tk.END, f"Suspicious Document {j+1} detected as {plagiarism_result} with max similarity: {max_similarity*100:.2f}%\n")
@@ -71,6 +76,8 @@ class PlagiarismCheckerApp:
         AUC = (1 + TP - FP) / 2
 
         messagebox.showinfo("Success", f"Results saved to files.\nTP: {TP}\nFP: {FP}\nTN: {TN}\nFN: {FN}\nAUC: {AUC}")
+        
+        save_results_to_txt(all_results, 'results/similarity_scores.txt')
 
     def clear_results(self):
         self.text_area.delete(1.0, tk.END)
