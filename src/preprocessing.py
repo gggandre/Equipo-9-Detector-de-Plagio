@@ -7,7 +7,7 @@ from nltk.stem import PorterStemmer
 import re
 
 def tokenize(text):
-    """ Divide el texto en tokens basados en espacios y puntuación. """
+    """ Divide el texto en tokens, excluyendo caracteres especiales y manteniendo sólo palabras alfabéticas y números. """
     return re.findall(r'\b\w+\b', text.lower())
 
 def remove_stopwords(tokens):

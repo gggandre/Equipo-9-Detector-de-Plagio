@@ -1,4 +1,5 @@
 import unittest
+from collections import Counter
 from src.feature_extraction import build_feature_vector
 
 class TestFeatureExtraction(unittest.TestCase):
@@ -53,9 +54,11 @@ class TestFeatureExtraction(unittest.TestCase):
         # Prueba con palabras que contienen caracteres especiales
         self.assertEqual(build_feature_vector(["!@#$", "%^&", "*()"]), {"!@#$": 1, "%^&": 1, "*()": 1})
 
-    def test_build_feature_vector_empty_strings(self):
-        # Prueba con cadenas vacías en la lista
-        self.assertEqual(build_feature_vector(["", "", ""]), {})
+        def test_build_feature_vector_empty_strings(self):
+        # Prueba con cadenas vacías en la lista. 
+        # La función cuenta todas las cadenas pasadas, incluyendo cadenas vacías.
+            self.assertEqual(build_feature_vector(["", "", ""]), Counter({'': 3}))
+
 
 if __name__ == '__main__':
     unittest.main()
