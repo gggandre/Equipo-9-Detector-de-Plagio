@@ -1,32 +1,61 @@
+# Autores: A01745312 - Paula Sophia Santoyo Arteaga
+#          A01753176 - Gilberto André García Gaytán
+#          A01379299 - Ricardo Ramírez Condado
+
+import nltk
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
 import re
 
 def tokenize(text):
-    """ Divide el texto en tokens basados en espacios y puntuación. """
+    """
+    Divide el texto en tokens, eliminando caracteres especiales y conservando solo palabras alfabéticas y números.
+    Args:
+        text (str): Texto a tokenizar.
+    Returns:
+        list: Lista de tokens extraídos del texto.
+    """
+    # Utiliza expresiones regulares para encontrar palabras o números
     return re.findall(r'\b\w+\b', text.lower())
 
-def remove_stopwords(tokens, stopwords):
-    """ Elimina stopwords de una lista de tokens. """
-    return [token for token in tokens if token not in stopwords]
-
-def lemmatize_word(word):
-    """ Aplica reglas básicas para lematización de palabras en inglés. """
-    if word.endswith('ies') and len(word) > 4:
-        return word[:-3] + 'y'
-    elif word.endswith('es'):
-        if word[-3] in 'sxz' or word[-4:-2] in ('sh', 'ch'):
-            return word[:-2]
-        else:
-            return word[:-1]
-    elif word.endswith('s'):
-        return word[:-1]
-    return word
+def remove_stopwords(tokens):
+    """
+    Elimina las stopwords de una lista de tokens.
+    Args:
+        tokens (list): Lista de tokens.
+    Returns:
+        list: Lista de tokens sin stopwords.
+    """
+    # Obtiene el conjunto de stopwords del inglés
+    stop_words = set(stopwords.words('english'))
+    # Filtra los tokens para remover las stopwords
+    return [token for token in tokens if token not in stop_words]
 
 def stem_words(tokens):
-    """ Aplica un enfoque simple de stemming a cada token, usando lematización manual. """
-    return [lemmatize_word(token) for token in tokens]
+    """
+    Aplica el proceso de stemming a cada token utilizando el algoritmo de Porter.
+    Args:
+        tokens (list): Lista de tokens a los cuales se les aplicará stemming.
+    Returns:
+        list: Lista de tokens después de aplicar stemming.
+    """
+    # Instancia un objeto PorterStemmer
+    stemmer = PorterStemmer()
+    # Aplica stemming a cada token
+    return [stemmer.stem(token) for token in tokens]
 
-def preprocess_text(text, stopwords):
-    """ Preprocesa el texto completo aplicando tokenización, remoción de stopwords y stemming. """
+def preprocess_text(text):
+    """
+    Preprocesa el texto realizando tokenización, eliminación de stopwords y stemming en secuencia.
+    Args:
+        text (str): Texto a preprocesar.
+    Returns:
+        list: Lista de tokens preprocesados.
+    """
+    # Aplica tokenización
     tokens = tokenize(text)
-    tokens = remove_stopwords(tokens, stopwords)
+    # Elimina stopwords
+    tokens = remove_stopwords(tokens)
+    # Aplica stemming
     return stem_words(tokens)

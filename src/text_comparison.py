@@ -1,13 +1,28 @@
-def cosine_similarity(vec1, vec2):
-    """ Calcula la similitud del coseno entre dos vectores de características. """
-    intersection = set(vec1.keys()) & set(vec2.keys())
-    numerator = sum([vec1[x] * vec2[x] for x in intersection])
+# Autores: A01745312 - Paula Sophia Santoyo Arteaga
+#          A01753176 - Gilberto André García Gaytán
+#          A01379299 - Ricardo Ramírez Condado
 
-    sum1 = sum([vec1[x]**2 for x in vec1.keys()])
-    sum2 = sum([vec2[x]**2 for x in vec2.keys()])
-    denominator = (sum1**0.5) * (sum2**0.5)
+def jaccard_similarity(vec1, vec2):
+    """
+    Calcula la similitud de Jaccard entre dos vectores de características, que son diccionarios donde las llaves son los
+    elementos y los valores son las frecuencias de esos elementos.
+    La similitud de Jaccard se define como el tamaño de la intersección dividido por el tamaño de la unión de los conjuntos
+    de llaves de ambos vectores.
+    Args:
+        vec1 (dict): Primer vector de características.
+        vec2 (dict): Segundo vector de características.
+    Returns:
+        float: Coeficiente de similitud de Jaccard, que varía entre 0 (sin similitud) y 1 (idénticos), inclusive.
+    """
+    # Determina la intersección de las llaves de ambos vectores
+    intersection = set(vec1.keys()) & set(vec2.keys())
+    # Determina la unión de las llaves de ambos vectores
+    union = set(vec1.keys()) | set(vec2.keys())
     
-    if not denominator:
-        return 0.0
+    # Maneja el caso especial donde ambos vectores son vacíos
+    if len(union) == 0:
+        return 1.0  # Si ambos conjuntos son vacíos, la similitud de Jaccard es 1.0
     else:
-        return float(numerator) / denominator
+        # Calcula la similitud de Jaccard como el tamaño de la intersección dividido por el tamaño de la unión
+        return len(intersection) / len(union)
+
