@@ -3,6 +3,7 @@
 #          A01379299 - Ricardo Ramírez Condado
 
 import pandas as pd
+from sklearn.metrics import roc_auc_score
 
 def load_document(filepath):
     """
@@ -31,41 +32,54 @@ def save_results_to_txt(all_results, plagiarism_results, filepath):
     Guarda los resultados de similitud en un archivo de texto, mostrando la comparación entre pares de documentos.
     Args:
         all_results (list): Lista de listas conteniendo resultados de similitud entre pares de documentos.
-        plagiarism_results (list): Lista de tuplas conteniendo los máximos de similitud encontrados para cada documento.
+        plagiarism_results (str): Cadena que contiene los resultados de plagio para ser incluida en el archivo.
         filepath (str): Ruta al archivo de texto donde se guardarán los resultados.
     """
     with open(filepath, 'w', encoding='utf-8') as file:
-        print(plagiarism_results)
-        for results, max_similarity in zip(all_results, plagiarism_results):
+        for results in all_results:
             for result in results:
                 file.write(f"{result[0]} vs {result[1]}: {result[2]*100:.2f}% similar\n")
-            # Insertar el máximo de similitud para este documento
-            file.write(f"Maximum plagiarism observed in {max_similarity[0]} vs {max_similarity[1]}: {max_similarity[2]*100:.2f}% similar\n")
+            # Insertar separación entre grupos de resultados
             file.write("\n---\n\n")
+        file.write(plagiarism_results)
 
-
-def save_results_to_excel(results, filepath):
+def save_results_to_excel(all_results, filepath):
     """
-    Guarda los resultados de similitud en un archivo Excel con las columnas Document 1, Document 2 y Similarity.
+    Guarda los resultados de similitud en un archivo Excel de manera organizada en columnas.
+
     Args:
-        results (list): Lista de tuplas conteniendo los nombres de los documentos y sus similitudes.
+        all_results (list): Lista de listas que contienen tuplas con la comparación entre documentos y su similitud.
         filepath (str): Ruta al archivo Excel donde se guardarán los resultados.
     """
-    df = pd.DataFrame(results, columns=['Document 1', 'Document 2', 'Similarity'])
-    df['Similarity'] = df['Similarity'] * 100  # Convertir la similitud a porcentaje
+    # Preparar los datos para el DataFrame
+    data = []
+    for result_set in all_results:
+        for result in result_set:
+            data.append({
+                'Document 1': result[0],
+                'Document 2': result[1],
+                'Similarity (%)': result[2] * 100  # Convertir la similitud a porcentaje
+            })
+    
+    # Crear DataFrame con los datos
+    df = pd.DataFrame(data)
+    # Guardar DataFrame en un archivo Excel
     df.to_excel(filepath, index=False)
 
-def evaluate_results(plagiarism_results, real_labels):
+def evaluate_results(plagiarism_results, real_labels, scores):
     """
-    Evalúa los resultados de una detección de plagio comparando los resultados esperados con los obtenidos.
+    Evalúa los resultados de una detección de plagio comparando los resultados esperados con los obtenidos,
+    y calcula el AUC.
     Args:
         plagiarism_results (list): Lista de resultados obtenidos (etiquetas 'plagiarism' o 'genuine').
         real_labels (list): Lista de etiquetas reales ('plagiarism' o 'genuine').
+        scores (list): Lista de puntuaciones (probabilidades o similitudes) asociadas a cada resultado.
     Returns:
-        tuple: Contiene los conteos de verdaderos positivos (TP), falsos positivos (FP),
-        verdaderos negativos (TN) y falsos negativos (FN).
+        dict: Contiene los conteos de TP, FP, TN, FN y el valor de AUC.
     """
     TP = FP = TN = FN = 0
+    binary_real_labels = [1 if label == "plagiarism" else 0 for label in real_labels]
+
     for result, real_label in zip(plagiarism_results, real_labels):
         if result == "plagiarism" and real_label == "plagiarism":
             TP += 1
@@ -75,4 +89,6 @@ def evaluate_results(plagiarism_results, real_labels):
             TN += 1
         elif result == "genuine" and real_label == "plagiarism":
             FN += 1
-    return TP, FP, TN, FN
+
+    auc = roc_auc_score(binary_real_labels, scores)
+    return {"TP": TP, "FP": FP, "TN": TN, "FN": FN, "AUC": auc}

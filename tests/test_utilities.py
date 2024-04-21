@@ -3,6 +3,7 @@
 #          A01379299 - Ricardo Ramírez Condado
 
 import unittest
+from unittest import mock
 from unittest.mock import mock_open, patch
 import sys
 import os
@@ -30,7 +31,7 @@ class TestUtilities(unittest.TestCase):
     def test_save_results_to_txt(self):
         # Test para verificar que se llama correctamente a la función de guardado en texto.
         results = [(("Doc1", "Doc2", 0.9),), (("Doc3", "Doc4", 0.75),)]
-        max_plagiarism = [('Original Document 76', 'Suspicious Document 1', 0.6197183098591549)]
+        max_plagiarism = "Doc1 vs Doc2: 90.00% similar\n"
         with patch('builtins.open', mock_open()) as mocked_file:
             utilities.save_results_to_txt(results, max_plagiarism, "fake_path.txt")
             mocked_file.assert_called_once_with("fake_path.txt", 'w', encoding='utf-8')
@@ -39,10 +40,40 @@ class TestUtilities(unittest.TestCase):
 
     def test_save_results_to_excel(self):
         # Test para verificar que se llama correctamente a la función de guardado en Excel.
-        results = [("Doc1", "Doc2", 0.9), ("Doc3", "Doc4", 0.75)]
-        with patch('pandas.DataFrame.to_excel') as mocked_to_excel:
+        # Preparando una lista de listas de tuplas, como espera la función.
+        results = [
+            [("Doc1", "Doc2", 0.9), ("Doc3", "Doc4", 0.75)],
+            [("Doc5", "Doc6", 0.85)]
+        ]
+        with mock.patch('pandas.DataFrame.to_excel') as mocked_to_excel:
             utilities.save_results_to_excel(results, "fake_path.xlsx")
             mocked_to_excel.assert_called_once_with("fake_path.xlsx", index=False)
+        # Verificar que todos los elementos en cada sublista de results son tuplas y cada tupla tiene tres elementos
+        for sub_list in results:
+            for result in sub_list:
+                self.assertIsInstance(result, tuple, "Cada resultado debe ser una tupla.")
+                self.assertEqual(len(result), 3, "Cada tupla debe contener exactamente tres elementos.")
+                
+    def test_evaluate_results(self):
+        # Datos de entrada simulados
+        plagiarism_results = ['plagiarism', 'genuine', 'plagiarism', 'genuine']
+        real_labels = ['plagiarism', 'plagiarism', 'genuine', 'genuine']
+        scores = [0.9, 0.2, 0.6, 0.1]
+        # Resultados esperados
+        expected_output = {
+            'TP': 1,
+            'FP': 1,
+            'TN': 1,
+            'FN': 1,
+            'AUC': 0.75  # Valor hipotético
+        }
+        # Mocking roc_auc_score
+        with mock.patch('utilities.roc_auc_score', return_value=0.75) as mocked_auc:
+            result = utilities.evaluate_results(plagiarism_results, real_labels, scores)
+            # Asegurar que roc_auc_score sea llamado una vez
+            mocked_auc.assert_called_once_with([1, 1, 0, 0], scores)
+        # Prueba de los resultados
+        self.assertEqual(result, expected_output)
 
 if __name__ == '__main__':
     unittest.main()

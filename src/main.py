@@ -5,7 +5,8 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, scrolledtext
 import os
-from utilities import load_document, save_results_to_txt, evaluate_results
+import pandas as pd
+from utilities import load_document, save_results_to_txt, save_results_to_excel, evaluate_results, roc_auc_score, evaluate_results
 from preprocessing import preprocess_text
 from feature_extraction import build_feature_vector
 from text_comparison import jaccard_similarity
@@ -15,7 +16,6 @@ class PlagiarismCheckerApp:
     def __init__(self, root):
         """
         Inicializa la interfaz de usuario del sistema de detección de plagio.
-
         Args:
             root (tk.Tk): Ventana principal de la aplicación Tkinter.
         """
@@ -23,7 +23,6 @@ class PlagiarismCheckerApp:
         self.root.title("Plagiarism Detection System")
         self.root.geometry("800x600")  # Establece las dimensiones de la ventana
         self.root.configure(background="#FEFAF6")  # Configura el color de fondo de la ventana
-
         # Inicialización de componentes de la interfaz de usuario
         self.frame = tk.Frame(self.root, bg="black")
         self.frame.pack(padx=20, pady=20)
@@ -51,7 +50,7 @@ class PlagiarismCheckerApp:
             self.text_area.insert(tk.END, f"Loaded {len(self.suspicious_documents)} suspicious documents.\n")
         else:
             messagebox.showinfo("Information", "No file selected.")
-            
+
     def check_plagiarism(self):
         """
         Verifica el plagio comparando documentos sospechosos con documentos originales y muestra los resultados.
@@ -59,40 +58,54 @@ class PlagiarismCheckerApp:
         if not self.suspicious_documents or not self.original_documents:
             messagebox.showwarning("Warning", "Please load both suspicious and original documents.")
             return
+        
         # Proceso de detección de plagio
+        processed_suspicious_docs = [preprocess_text(doc) for doc in self.suspicious_documents]
         processed_original_docs = [preprocess_text(doc) for doc in self.original_documents]
-        # Limpiar el área de texto
-        self.text_area.delete(1.0, tk.END)
-        all_results = []  # Almacenar todos los resultados para cada documento sospechoso
-        sorted_results = []  # Almacenar los resultados ordenados por similitud
-        max_plagiarism = []
-        # Iterar sobre cada documento sospechoso
-        for j, suspicious_doc in enumerate(self.suspicious_documents):
-            processed_suspicious_doc = preprocess_text(suspicious_doc)
+        plagiarism_results, real_labels, all_results, scores = [], [], [], []
+        
+        # Umbral de similitud para considerar un documento como plagiado
+        SIMILARITY_THRESHOLD = 0.8  # Este es un valor aproximado
+        
+        for j, suspicious_doc in enumerate(processed_suspicious_docs):
+            max_similarity, plagiarism_result = 0, "genuine"
             results = []
-            # Comparar el documento sospechoso con cada documento original
+            
             for i, original_doc in enumerate(processed_original_docs):
-                similarity = jaccard_similarity(build_feature_vector(original_doc), build_feature_vector(processed_suspicious_doc))
+                similarity = jaccard_similarity(build_feature_vector(original_doc), build_feature_vector(suspicious_doc))
                 results.append((f"Original Document {i+1}", f"Suspicious Document {j+1}", similarity))
-            # Ordenar los resultados por similitud descendente y obtener el top 5
+                if similarity > max_similarity:
+                    max_similarity = similarity
+                    plagiarism_result = "plagiarism" if similarity >= SIMILARITY_THRESHOLD else "genuine"
             all_results.append(results)
+            plagiarism_results.append(plagiarism_result)
+            # La etiqueta real se basaría en si supera el umbral de similitud
+            real_labels.append(plagiarism_result)
+            scores.append(max_similarity)  # Guarda la máxima similitud encontrada para uso en el cálculo del AUC
+            
+            # Ordenar los resultados por similitud y obtener el top 5
             sorted_results = sorted(results, key=lambda x: x[2], reverse=True)[:5]
-            max_plagiarism.append(sorted_results[0])
-            # Mostrar el título del documento sospechoso
-            self.text_area.insert(tk.END, f"\nTop 5 plagiarism suspicious document {j+1}\n")
-            # Mostrar los resultados en la interfaz para este documento sospechoso
+            self.text_area.insert(tk.END, f"\nTop 5 most similar original documents to Suspicious Document {j+1}:\n")
             for result in sorted_results:
                 self.text_area.insert(tk.END, f"{result[0]} with {result[1]}: {result[2]*100:.2f}% similar\n")
-            # Guardar los resultados en la lista total
-            sorted_results.extend(sorted_results)
-        # Guardar los resultados en un archivo de texto
-        # Calcular AUC y mostrar un mensaje con los resultados
-        TP, FP, TN, FN = evaluate_results(sorted_results, [1]*len(sorted_results))  # Todos los resultados son positivos
-        AUC = (1 + TP - FP) / 2
-        messagebox.showinfo("Success", f"Results saved to files.\nTP: {TP}\nFP: {FP}\nTN: {TN}\nFN: {FN}\nAUC: {AUC}")
-        #print(sorted_results)
-        save_results_to_txt(all_results, max_plagiarism, 'results/similarity_scores.txt')
-
+        
+        # Manejo de la diversidad de clases para el cálculo de AUC
+        if len(set(real_labels)) < 2:
+            messagebox.showwarning("AUC Calculation", "AUC cannot be calculated with only one class present in real labels.")
+        else:
+            # Evaluación de resultados
+            evaluation_results = evaluate_results(plagiarism_results, real_labels, scores)
+            # Calcular AUC utilizando sklearn.metrics.roc_auc_score
+            evaluation_results = evaluate_results(plagiarism_results, real_labels, scores)
+            TP, FP, TN, FN, auc_score = evaluation_results.values()
+            messagebox.showinfo("Plagiarism Check Results", f"True Positives: {TP}\nFalse Positives: {FP}\nTrue Negatives: {TN}\nFalse Negatives: {FN}\nAUC: {auc_score:.2f}")
+        # Guardar resultados en archivos
+        # Concatena los resultados de plagio en una cadena de texto
+        plagiarism_results_str = "\n".join(f"Suspicious Document {i+1} detected as {result}" for i, result in enumerate(plagiarism_results))
+        # Guardar resultados en archivo de texto
+        save_results_to_txt(all_results, plagiarism_results_str, 'results/similarity_scores.txt')
+        save_results_to_excel(all_results, 'results/similarity_scores.xlsx')
+        messagebox.showinfo("Success", "Results saved to text and Excel files.")
 
     def clear_results(self):
         """
@@ -103,10 +116,8 @@ class PlagiarismCheckerApp:
 def load_original_documents(directory):
     """
     Carga documentos originales de un directorio especificado.
-
     Args:
         directory (str): Ruta del directorio donde se encuentran los documentos originales.
-
     Returns:
         list: Lista de documentos originales cargados.
     """
