@@ -26,20 +26,23 @@ def load_stopwords(filepath='data/stopwords.txt'):
     with open(filepath, 'r', encoding='utf-8') as file:
         return set(file.read().split())
 
-def save_results_to_txt(all_results, plagiarism_results, filepath, ):
+def save_results_to_txt(all_results, plagiarism_results, filepath):
     """
     Guarda los resultados de similitud en un archivo de texto, mostrando la comparación entre pares de documentos.
     Args:
         all_results (list): Lista de listas conteniendo resultados de similitud entre pares de documentos.
+        plagiarism_results (list): Lista de tuplas conteniendo los máximos de similitud encontrados para cada documento.
         filepath (str): Ruta al archivo de texto donde se guardarán los resultados.
     """
     with open(filepath, 'w', encoding='utf-8') as file:
-        for results in all_results:
+        print(plagiarism_results)
+        for results, max_similarity in zip(all_results, plagiarism_results):
             for result in results:
                 file.write(f"{result[0]} vs {result[1]}: {result[2]*100:.2f}% similar\n")
-            # Insertar separación entre grupos de resultados
-            file.write(plagiarism_results)
+            # Insertar el máximo de similitud para este documento
+            file.write(f"Maximum plagiarism observed in {max_similarity[0]} vs {max_similarity[1]}: {max_similarity[2]*100:.2f}% similar\n")
             file.write("\n---\n\n")
+
 
 def save_results_to_excel(results, filepath):
     """

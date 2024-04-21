@@ -51,7 +51,7 @@ class PlagiarismCheckerApp:
             self.text_area.insert(tk.END, f"Loaded {len(self.suspicious_documents)} suspicious documents.\n")
         else:
             messagebox.showinfo("Information", "No file selected.")
-
+            
     def check_plagiarism(self):
         """
         Verifica el plagio comparando documentos sospechosos con documentos originales y muestra los resultados.
@@ -60,29 +60,39 @@ class PlagiarismCheckerApp:
             messagebox.showwarning("Warning", "Please load both suspicious and original documents.")
             return
         # Proceso de detección de plagio
-        processed_suspicious_docs = [preprocess_text(doc) for doc in self.suspicious_documents]
         processed_original_docs = [preprocess_text(doc) for doc in self.original_documents]
-        # Verificación de plagio y actualización de la interfaz con los resultados
-        plagiarism_results, real_labels, all_results = [], [], []
-        for j, suspicious_doc in enumerate(processed_suspicious_docs):
-            max_similarity, plagiarism_result, real_label = 0, "genuine", "genuine"
+        # Limpiar el área de texto
+        self.text_area.delete(1.0, tk.END)
+        all_results = []  # Almacenar todos los resultados para cada documento sospechoso
+        sorted_results = []  # Almacenar los resultados ordenados por similitud
+        max_plagiarism = []
+        # Iterar sobre cada documento sospechoso
+        for j, suspicious_doc in enumerate(self.suspicious_documents):
+            processed_suspicious_doc = preprocess_text(suspicious_doc)
             results = []
+            # Comparar el documento sospechoso con cada documento original
             for i, original_doc in enumerate(processed_original_docs):
-                similarity = jaccard_similarity(build_feature_vector(original_doc), build_feature_vector(suspicious_doc))
+                similarity = jaccard_similarity(build_feature_vector(original_doc), build_feature_vector(processed_suspicious_doc))
                 results.append((f"Original Document {i+1}", f"Suspicious Document {j+1}", similarity))
-                self.text_area.insert(tk.END, f"Jaccard Similarity between Original Document {i+1} and Suspicious Document {j+1}: {similarity*100:.2f}%\n")
-                if similarity > max_similarity:
-                    max_similarity, plagiarism_result, real_label = similarity, f"plagiarism from Original Document {i+1}", "plagiarism"
+            # Ordenar los resultados por similitud descendente y obtener el top 5
             all_results.append(results)
-            plagiarism_results.append(plagiarism_result)
-            real_labels.append(real_label)
-            self.text_area.insert(tk.END, f"Suspicious Document {j+1} detected as {plagiarism_result} with max similarity: {max_similarity*100:.2f}%\n")
-        # Evaluación de resultados y guardado en archivo
-        TP, FP, TN, FN = evaluate_results(plagiarism_results, real_labels)
+            sorted_results = sorted(results, key=lambda x: x[2], reverse=True)[:5]
+            max_plagiarism.append(sorted_results[0])
+            # Mostrar el título del documento sospechoso
+            self.text_area.insert(tk.END, f"\nTop 5 plagiarism suspicious document {j+1}\n")
+            # Mostrar los resultados en la interfaz para este documento sospechoso
+            for result in sorted_results:
+                self.text_area.insert(tk.END, f"{result[0]} with {result[1]}: {result[2]*100:.2f}% similar\n")
+            # Guardar los resultados en la lista total
+            sorted_results.extend(sorted_results)
+        # Guardar los resultados en un archivo de texto
+        # Calcular AUC y mostrar un mensaje con los resultados
+        TP, FP, TN, FN = evaluate_results(sorted_results, [1]*len(sorted_results))  # Todos los resultados son positivos
         AUC = (1 + TP - FP) / 2
         messagebox.showinfo("Success", f"Results saved to files.\nTP: {TP}\nFP: {FP}\nTN: {TN}\nFN: {FN}\nAUC: {AUC}")
-        to_txt = f'{plagiarism_result}: {max_similarity*100:.2f}% similar\n'
-        save_results_to_txt(all_results, to_txt, 'results/similarity_scores.txt')
+        #print(sorted_results)
+        save_results_to_txt(all_results, max_plagiarism, 'results/similarity_scores.txt')
+
 
     def clear_results(self):
         """

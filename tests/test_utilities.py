@@ -30,7 +30,7 @@ class TestUtilities(unittest.TestCase):
     def test_save_results_to_txt(self):
         # Test para verificar que se llama correctamente a la función de guardado en texto.
         results = [(("Doc1", "Doc2", 0.9),), (("Doc3", "Doc4", 0.75),)]
-        max_plagiarism = "Doc1 vs Doc2: 90.00% similar\n"
+        max_plagiarism = [('Original Document 76', 'Suspicious Document 1', 0.6197183098591549)]
         with patch('builtins.open', mock_open()) as mocked_file:
             utilities.save_results_to_txt(results, max_plagiarism, "fake_path.txt")
             mocked_file.assert_called_once_with("fake_path.txt", 'w', encoding='utf-8')
