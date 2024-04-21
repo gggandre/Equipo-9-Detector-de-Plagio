@@ -81,7 +81,8 @@ class PlagiarismCheckerApp:
         TP, FP, TN, FN = evaluate_results(plagiarism_results, real_labels)
         AUC = (1 + TP - FP) / 2
         messagebox.showinfo("Success", f"Results saved to files.\nTP: {TP}\nFP: {FP}\nTN: {TN}\nFN: {FN}\nAUC: {AUC}")
-        save_results_to_txt(all_results, 'results/similarity_scores.txt')
+        to_txt = f'{plagiarism_result}: {max_similarity*100:.2f}% similar\n'
+        save_results_to_txt(all_results, to_txt, 'results/similarity_scores.txt')
 
     def clear_results(self):
         """
