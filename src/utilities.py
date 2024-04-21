@@ -27,7 +27,12 @@ def load_stopwords(filepath='data/stopwords.txt'):
         return set(file.read().split())
 
 def save_results_to_txt(all_results, plagiarism_results, filepath, ):
-    """Guarda los resultados de similitud en un archivo de texto."""
+    """
+    Guarda los resultados de similitud en un archivo de texto, mostrando la comparación entre pares de documentos.
+    Args:
+        all_results (list): Lista de listas conteniendo resultados de similitud entre pares de documentos.
+        filepath (str): Ruta al archivo de texto donde se guardarán los resultados.
+    """
     with open(filepath, 'w', encoding='utf-8') as file:
         for results in all_results:
             for result in results:
