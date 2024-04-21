@@ -20,8 +20,8 @@ def save_results_to_txt(all_results, plagiarism_results, filepath, ):
             for result in results:
                 file.write(f"{result[0]} vs {result[1]}: {result[2]*100:.2f}% similar\n")
             # Insertar separación entre grupos de resultados
-        file.write(plagiarism_results)
-        file.write("\n---\n\n")
+            file.write(plagiarism_results)
+            file.write("\n---\n\n")
 
 
 def save_results_to_excel(results, filepath):
