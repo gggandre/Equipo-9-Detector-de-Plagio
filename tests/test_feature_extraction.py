@@ -1,3 +1,7 @@
+# Autores: A01745312 - Paula Sophia Santoyo Arteaga
+#          A01753176 - Gilberto André García Gaytán
+#          A01379299 - Ricardo Ramírez Condado
+
 import unittest
 from collections import Counter
 from src.feature_extraction import build_feature_vector
