@@ -1,10 +1,13 @@
+# Autores: A01745312 - Paula Sophia Santoyo Arteaga
+#          A01753176 - Gilberto André García Gaytán
+#          A01379299 - Ricardo Ramírez Condado
 import unittest
 from unittest.mock import patch, MagicMock
 import tkinter as tk
 import sys
 import os
 
-# Esto agrega la carpeta 'src' al path para que puedas importar desde ella
+# Esto agrega la carpeta 'src' al path para que se pueda importar
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 from main import PlagiarismCheckerApp, load_original_documents
 
