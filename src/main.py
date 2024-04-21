@@ -1,3 +1,5 @@
+# main.py
+
 import tkinter as tk
 from tkinter import filedialog, messagebox, scrolledtext
 import os
@@ -11,19 +13,22 @@ class PlagiarismCheckerApp:
         self.root = root
         self.root.title("Plagiarism Detection System")
         
-        self.frame = tk.Frame(self.root)
+        self.root.geometry("800x600")  # Ancho x Alto
+        self.root.configure(background="#FEFAF6")
+
+        self.frame = tk.Frame(self.root, bg="black")
         self.frame.pack(padx=20, pady=20)
 
-        self.load_btn = tk.Button(self.frame, text="Load Suspicious Documents", command=self.load_suspicious_files)
+        self.load_btn = tk.Button(self.frame, text="Load Suspicious Documents", command=self.load_suspicious_files, bg="#EADBC8", fg="black", width=5, height=1)
         self.load_btn.pack(side=tk.TOP, fill=tk.X)
 
-        self.run_btn = tk.Button(self.frame, text="Check Plagiarism", command=self.check_plagiarism)
+        self.run_btn = tk.Button(self.frame, text="Check Plagiarism", command=self.check_plagiarism, bg="#EADBC8", fg="black", width=5, height=1)
         self.run_btn.pack(side=tk.TOP, fill=tk.X)
 
-        self.clear_btn = tk.Button(self.frame, text="Clear Results", command=self.clear_results)
-        self.clear_btn.pack(side=tk.TOP, fill=tk.X)
+        self.clear_btn = tk.Button(self.frame, text="Clear Results", command=self.clear_results, width=5, bg="#102C57", fg="white", height=2, anchor="center")
+        self.clear_btn.pack(side=tk.BOTTOM, fill=tk.X)
 
-        self.text_area = scrolledtext.ScrolledText(self.frame, wrap=tk.WORD, height=10, width=60)
+        self.text_area = scrolledtext.ScrolledText(self.frame, wrap=tk.WORD, height=30, width=100, bg="#FEFAF6")
         self.text_area.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         
         self.original_documents = []
@@ -59,7 +64,7 @@ class PlagiarismCheckerApp:
             all_results.append(results)
 
         save_results_to_txt(all_results, 'results/similarity_scores.txt')
-        save_results_to_excel(all_results, 'results/similarity_scores.xlsx')
+        #save_results_to_excel(all_results, 'results/similarity_scores.xlsx')
         messagebox.showinfo("Success", "Results saved to files.")
 
 
