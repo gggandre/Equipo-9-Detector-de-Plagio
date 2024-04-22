@@ -38,7 +38,8 @@ def save_results_to_txt(all_results, plagiarism_results, filepath):
     with open(filepath, 'w', encoding='utf-8') as file:
         for results in all_results:
             for result in results:
-                file.write(f"{result[0]} vs {result[1]}: {result[2]*100:.2f}% similar\n")
+                similarity = round(result[2] * 100, 2)  # Redondeo aplicado
+                file.write(f"{result[0]} vs {result[1]}: {similarity}% similar\n")
             # Insertar separación entre grupos de resultados
             file.write("\n---\n\n")
         file.write(plagiarism_results)
@@ -50,14 +51,17 @@ def save_results_to_excel(all_results, filepath):
         all_results (list): Lista de listas que contienen tuplas con la comparación entre documentos y su similitud.
         filepath (str): Ruta al archivo Excel donde se guardarán los resultados.
     """
+    import pandas as pd  # Asegúrate de tener importado pandas como pd
+
     # Preparar los datos para el DataFrame
     data = []
     for result_set in all_results:
         for result in result_set:
+            similarity = round(result[2] * 100, 2)  # Redondeo aplicado
             data.append({
                 'Original Document': result[0],
                 'Suspicious Document': result[1],
-                'Similarity (%)': result[2] * 100  # Convertir la similitud a porcentaje
+                'Similarity (%)': similarity
             })
     
     # Crear DataFrame con los datos
