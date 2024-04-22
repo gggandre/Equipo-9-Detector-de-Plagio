@@ -7,50 +7,8 @@ Este proyecto es un sistema de detección de plagio diseñado para analizar text
 La estructura del proyecto se organiza de la siguiente manera:
 
 
-Equipo-9-Detector-de-Plagio
-|-- data
-| |-- FID-01.txt
-| |-- FID-02.txt
-| |-- FID-03.txt
-| |-- FID-04.txt
-| |-- FID-05.txt
-| |-- FID-06.txt
-| |-- FID-07.txt
-| |-- FID-08.txt
-| |-- FID-09.txt
-| |-- FID-10.txt
-| |-- original
-| | |-- org-001.txt
-| | |-- org-002.txt
-| | |-- ...
-| | |-- org-110.txt
-|-- README.md
-|-- requirements.txt
-|-- results
-| |-- similarity_scores.txt
-| |-- similarity_scores.xlsx
-|-- src
-| | |-- feature_extraction.cpython-312.pyc
-| | |-- model_training.cpython-312.pyc
-| | |-- text_comparison.cpython-312.pyc
-| |-- feature_extraction.py
-| |-- main.py
-| |-- preprocessing.py
-| |-- text_comparison.py
-| |-- utilities.py
-|-- tests
-| |-- init.py
-| | |-- init.cpython-312.pyc
-| | |-- test_feature_extraction.cpython-312.pyc
-| | |-- test_main.cpython-312.pyc
-| | |-- test_preprocessing.cpython-312.pyc
-| | |-- test_text_comparison.cpython-312.pyc
-| | |-- test_utilities.cpython-312.pyc
-| |-- test_feature_extraction.py
-| |-- test_main.py
-| |-- test_preprocessing.py
-| |-- test_text_comparison.py
-| |-- test_utilities.py
+![image](https://github.com/gggandre/Equipo-9-Detector-de-Plagio/assets/84719490/24c6fcb4-20de-41a9-9560-f80279fae6d0)
+
 
 
 ## Configuración del Entorno
