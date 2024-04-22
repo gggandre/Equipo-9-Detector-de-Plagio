@@ -5,6 +5,8 @@ Este proyecto es un sistema de detección de plagio diseñado para analizar text
 ## Estructura del Proyecto
 
 La estructura del proyecto se organiza de la siguiente manera:
+
+
 ![image](https://github.com/gggandre/Equipo-9-Detector-de-Plagio/assets/84719490/3ed64b91-de56-47d4-abc8-616b5ca16910)
 
 ## Configuración del Entorno
