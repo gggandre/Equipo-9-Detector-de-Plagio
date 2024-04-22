@@ -5,28 +5,7 @@ Este proyecto es un sistema de detección de plagio diseñado para analizar text
 ## Estructura del Proyecto
 
 La estructura del proyecto se organiza de la siguiente manera:
-plagiarism_detection_system/
-│
-├── src/
-│ ├── init.py
-│ ├── main.py # Script principal con la lógica de la interfaz de usuario.
-│ ├── preprocessing.py # Módulo para el preprocesamiento de textos.
-│ ├── feature_extraction.py # Módulo para la extracción de características.
-│ ├── text_comparison.py # Módulo para comparar textos.
-│ └── utilities.py # Funciones utilitarias como carga de documentos.
-│
-├── tests/
-│ ├── init.py
-│ ├── test_preprocessing.py
-│ ├── test_feature_extraction.py
-│ └── test_text_comparison.py
-│
-├── data/
-│ ├── original/ # Directorio para documentos de prueba.
-│
-├── results/ # Aquí se guardan los archvivos con los resultados de plagio.
-│
-└── requirements.txt # Dependencias del proyecto.
+![image](https://github.com/gggandre/Equipo-9-Detector-de-Plagio/assets/84719490/3ed64b91-de56-47d4-abc8-616b5ca16910)
 
 ## Configuración del Entorno
 
