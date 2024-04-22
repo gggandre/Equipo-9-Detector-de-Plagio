@@ -46,7 +46,6 @@ def save_results_to_txt(all_results, plagiarism_results, filepath):
 def save_results_to_excel(all_results, filepath):
     """
     Guarda los resultados de similitud en un archivo Excel de manera organizada en columnas.
-
     Args:
         all_results (list): Lista de listas que contienen tuplas con la comparación entre documentos y su similitud.
         filepath (str): Ruta al archivo Excel donde se guardarán los resultados.
@@ -56,8 +55,8 @@ def save_results_to_excel(all_results, filepath):
     for result_set in all_results:
         for result in result_set:
             data.append({
-                'Document 1': result[0],
-                'Document 2': result[1],
+                'Original Document': result[0],
+                'Suspicious Document': result[1],
                 'Similarity (%)': result[2] * 100  # Convertir la similitud a porcentaje
             })
     
